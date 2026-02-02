@@ -1,26 +1,38 @@
 import os
-import requests
 from supabase import create_client
 
-# Verbindung zu deiner DB
-url = os.environ.get("SUPABASE_URL")
-key = os.environ.get("SUPABASE_KEY")
-supabase = create_client(url, key)
-
-def crawl_and_upload():
-    # Test-Event
-    new_event = {
-        "name": "Formula 1 Test Event",
-        "category": "Auto",
-        "description": "F1 Live",
-        "latitude": 52.5207,
-        "longitude": 13.4094,
-        "price_participation": 0
-    }
+def run_crawler():
+    # 1. Verbindung zu Supabase herstellen
+    # GitHub Actions füllt diese Werte automatisch aus deinen 'Secrets' aus
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
     
-    # In Supabase hochladen
-    data = supabase.table("events").insert(new_event).execute()
-    print(f"Erfolg: {data}")
+    if not url or not key:
+        print("Fehler: SUPABASE_URL oder SUPABASE_KEY fehlen in den Secrets!")
+        return
+
+    supabase = create_client(url, key)
+
+    # 2. Ein Test-Event vorbereiten
+    # Wichtig: Die Spaltennamen (name, category, etc.) müssen exakt so in deiner Tabelle stehen!
+    test_event = {
+        "name": "Live Test Event",
+        "category": "Auto",
+        "description": "Crawler Test erfolgreich!",
+        "latitude": 52.52,
+        "longitude": 13.40,
+        "stream_url": "https://youtube.com/live"
+    }
+
+    print(f"Versuche Event hochzuladen: {test_event['name']}...")
+
+    # 3. In die Tabelle 'events' einfügen
+    try:
+        response = supabase.table("events").insert(test_event).execute()
+        print("Erfolg! Das Event wurde in Supabase gespeichert.")
+        print(response)
+    except Exception as e:
+        print(f"Fehler beim Hochladen: {e}")
 
 if __name__ == "__main__":
-    crawl_and_upload()
+    run_crawler()

@@ -1,26 +1,23 @@
-name: Racing Crawler Engine
-
+name: RaceRadar-Crawler
 on:
-  schedule:
-    - cron: '0 6 * * *' # Läuft jeden Morgen um 6 Uhr automatisch
-  workflow_dispatch: # Erlaubt dir, den Crawler jederzeit manuell per Knopfdruck zu starten
+  workflow_dispatch:
 
 jobs:
-  run-crawler:
+  run-it:
     runs-on: ubuntu-latest
     steps:
       - name: Code laden
         uses: actions/checkout@v3
 
-      - name: Python vorbereiten
+      - name: Python einrichten
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      - name: Supabase Tool installieren
+      - name: Pakete installieren
         run: pip install supabase requests
 
-      - name: Crawler starten
+      - name: Crawler ausfuehren
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}

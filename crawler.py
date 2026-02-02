@@ -1,30 +1,26 @@
-name: Racing Crawler
+import os
+import requests
+from supabase import create_client
 
-on:
-  schedule:
-    - cron: '0 0 * * *' # Läuft einmal täglich
-  workflow_dispatch: # Erlaubt manuelles Starten
+# Verbindung zu deiner DB
+url = os.environ.get("SUPABASE_URL")
+key = os.environ.get("SUPABASE_KEY")
+supabase = create_client(url, key)
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Code auschecken
-        uses: actions/checkout@v3
+def crawl_and_upload():
+    # Test-Event
+    new_event = {
+        "name": "Formula 1 Test Event",
+        "category": "Auto",
+        "description": "F1 Live",
+        "latitude": 52.5207,
+        "longitude": 13.4094,
+        "price_participation": 0
+    }
+    
+    # In Supabase hochladen
+    data = supabase.table("events").insert(new_event).execute()
+    print(f"Erfolg: {data}")
 
-      - name: Python installieren
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Abhängigkeiten installieren
-        run: |
-          pip install supabase
-          # Falls du andere Bibliotheken wie 'requests' nutzt, hier hinzufügen:
-          # pip install requests 
-
-      - name: Crawler ausführen
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: python crawler.py # Hier muss der Name deiner Datei stehen!
+if __name__ == "__main__":
+    crawl_and_upload()
